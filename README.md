@@ -1,5 +1,8 @@
 # Cogdemov2
-mobile number verification library (v2) integrated for android
+mobile number verification library (v2) integrated demo for android
+
+
+Thi
 
 The working demo is published on google play store :
 
