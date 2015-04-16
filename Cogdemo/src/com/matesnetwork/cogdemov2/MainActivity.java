@@ -1,16 +1,20 @@
 package com.matesnetwork.cogdemov2;
 
+import com.matesnetwork.Cognalys.VerifyMobile;
+
+import android.support.v7.app.ActionBarActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.matesnetwork.Cognalys.VerifyMobile;
 
 public class MainActivity extends ActionBarActivity {
 	Button test;
@@ -36,9 +40,9 @@ public class MainActivity extends ActionBarActivity {
 						+ mobilenum.getText().toString();
 				Intent in = new Intent(MainActivity.this, VerifyMobile.class);
 
-				in.putExtra("app_id", "YOUR_APP_ID_HERE");
+				in.putExtra("app_id", "YOUR_APP_ID");
 				in.putExtra("access_token",
-						"YOUR_ACCESS_TOKEN_HERE");
+						"YOUR_ACCESS_TOKEN");
 				in.putExtra("mobile", mobile);
 				if (mobile.length() == 0) {
 					countrycode.setError("Please enter mobile number");

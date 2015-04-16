@@ -1,6 +1,7 @@
 package com.matesnetwork.Cognalys;
 
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +50,7 @@ public class VerifyMobile extends Activity {
 	String access_toke;
 	String otp_number;
 	String app_id;
-	boolean flag;
+	boolean flag = false;
 	SharedPreferences pref;
 	TextView load;
 	ProgressDialog dialog;
@@ -169,29 +170,6 @@ public class VerifyMobile extends Activity {
 			edit.putBoolean("clip_check", true);
 			edit.commit();
 		}
-		// int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-		// if (currentapiVersion < 12) {
-		// manager = (android.text.ClipboardManager)
-		// getSystemService(CLIPBOARD_SERVICE);
-		// cliptext = manager.getText().toString();
-		// if (isNumeric(cliptext)) {
-		// miscallnum.setText(cliptext);
-		// }
-		// } else {
-		// clip = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-		// ClipData data = clip.getPrimaryClip();
-		// ClipData.Item item = null;
-		// if (data != null) {
-		// item = data.getItemAt(0);
-		// }
-		// if (item != null) {
-		// cliptext = item.getText().toString();
-		// if (isNumeric(cliptext)) {
-		// miscallnum.setText(cliptext);
-		// }
-		//
-		// }
-		// }
 
 		verifywithclipboard.setOnClickListener(new OnClickListener() {
 
@@ -289,54 +267,69 @@ public class VerifyMobile extends Activity {
 					+ "&os_version=" + os + "&model_number=" + model_num
 					+ "&lon=" + longitude + "&gmail_id=" + gmail_id;
 			System.out.println(url);
-			String jsonStr = sh.makeServiceCall(Constants.BASE_URL + "?app_id="
-					+ app_id + "&access_token=" + access_toke + "&mobile="
-					+ mobilenumber + "&imei=" + imei + "&mcc=" + mcc + "&mnc="
-					+ mnc + "&lat=" + latitude + "&brand_name=" + brand_name
-					+ "&os_version=" + os + "&model_number=" + model_num
-					+ "&lon=" + longitude + "&gmail_id=" + gmail_id,
-					ServiceHandler.GET);
 
+			String jsonStr = sh.makeServiceCall(
+					Constants.BASE_URL + "?app_id=" + URLEncoder.encode(app_id)
+							+ "&access_token=" + URLEncoder.encode(access_toke)
+							+ "&mobile=" + mobilenumber + "&imei="
+							+ URLEncoder.encode(imei) + "&mcc="
+							+ URLEncoder.encode(mcc) + "&mnc="
+							+ URLEncoder.encode(mnc) + "&lat="
+							+ URLEncoder.encode(latitude) + "&brand_name="
+							+ URLEncoder.encode(brand_name) + "&os_version="
+							+ URLEncoder.encode(os) + "&model_number="
+							+ URLEncoder.encode(model_num) + "&lon="
+							+ URLEncoder.encode(longitude) + "&gmail_id="
+							+ URLEncoder.encode(gmail_id), ServiceHandler.GET);
+			// String jsonStr = sh.makeServiceCall(URLEncoder.encode(url),
+			// ServiceHandler.GET);
 			JSONObject obj = null;
 			try {
-				obj = new JSONObject(jsonStr);
+				if (jsonStr != null) {
+					obj = new JSONObject(jsonStr);
+				}
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+
 			}
-			try {
-				status = obj.getString("status");
-				if (status != null) {
 
-					if (status.equalsIgnoreCase("failed")) {
+			if (obj != null) {
 
-						JSONArray arr = obj.getJSONArray("codes");
-						Log.d("errors", "error code = " + arr.toString());
-						// error = json.getString("404");
-						Intent in = new Intent();
-						in.putExtra("message", Constants.ONE);
-						in.putExtra("result", 101);
-						Log.d("More Details",
-								"https://www.cognalys.com/androidlibraryerrors/");
-						setResult(REQUEST_CODE, in);
+				try {
+					status = obj.getString("status");
+					if (status != null) {
 
-						finish();
+						if (status.equalsIgnoreCase("failed")) {
 
-					} else {
-						Log.d("verification",
-								"verification api calls succesfully");
-						booleans = true;
-						cipher = obj.getString("cipher");
+							JSONArray arr = obj.getJSONArray("codes");
+							Log.d("errors", "error code = " + arr.toString());
+							// error = json.getString("404");
+							Intent in = new Intent();
+							in.putExtra("message", Constants.ONE);
+							in.putExtra("result", 101);
+							Log.d("More Details",
+									"https://www.cognalys.com/androidlibraryerrors/");
+							setResult(REQUEST_CODE, in);
 
-						cipher = cipher.substring(12, 23);
-						System.out.println(cipher);
+							finish();
 
-						otp_number = "+" + obj.getString("mobile");
+						} else {
+							Log.d("verification",
+									"verification api calls succesfully");
+							booleans = true;
+							cipher = obj.getString("cipher");
+
+							cipher = cipher.substring(12, 23);
+							System.out.println(cipher);
+
+							otp_number = "+" + obj.getString("mobile");
+						}
 					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
 			return null;
@@ -371,11 +364,23 @@ public class VerifyMobile extends Activity {
 							// TODO React to incoming call.
 
 							if (state == TelephonyManager.CALL_STATE_RINGING) {
-								String number = incomingNumber.substring(4, 10);
-
+								String number = incomingNumber.substring(6, 10);
+								number = number.replace(" ", "");
+								number = number.replace("-", "");
+								number = number.replace("+", "");
+								number = number.replace(")", "");
+								number = number.replace("(", "");
 								if (cipher.contains(number)) {
+									Intent in = new Intent();
+									in.putExtra("message", Constants.FOUR);
+									in.putExtra("result", 104);
+									setResult(REQUEST_CODE, in);
+									telephonyManager.listen(callStateListener,
+											PhoneStateListener.LISTEN_NONE);
+									finish();
+									Verifynumber verification=new Verifynumber();
+									verification.execute();
 									callnumber = incomingNumber;
-									call_state = true;
 
 									try {
 										Class c = Class
@@ -399,16 +404,13 @@ public class VerifyMobile extends Activity {
 							}
 
 							if (state == TelephonyManager.CALL_STATE_IDLE) {
-								if (call_state) {
-									if (!flag) {
-										// Mythread th = new Mythread();
-										// th.start();
-										getCallDetails();
 
-										loadinglayout
-												.setVisibility(View.VISIBLE);
-									}
-									call_state = false;
+								if (!flag) {
+									// Mythread th = new Mythread();
+									// th.start();
+									getCallDetails();
+
+									loadinglayout.setVisibility(View.VISIBLE);
 								}
 
 							}
@@ -515,27 +517,6 @@ public class VerifyMobile extends Activity {
 		return flags;
 	}
 
-	public class Mythread extends Thread {
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			int index;
-			for (index = 0; index < 2; index++) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			if (index == 2) {
-				// getCallDetails();
-
-			}
-			super.run();
-		}
-	}
-
 	public class Verifynumber extends AsyncTask<Void, Void, Void> {
 		String status = null;
 		String app_user_id;
@@ -553,14 +534,19 @@ public class VerifyMobile extends Activity {
 			// + "&gmail_id=" + gmail_id;
 			// Log.d("url", url);
 			String json = handler.makeServiceCall(
-					Constants.BASE_URL2 + "?app_id=" + app_id
-							+ "&access_token=" + access_toke + "&mobile="
-							+ otp_number + "&imei=" + imei + "&mcc=" + mcc
-							+ "&mnc=" + mnc + "&lat=" + latitude
-							+ "&brand_name=" + brand_name + "&os_version=" + os
-							+ "&model_number=" + model_num + "&lon="
-							+ longitude + "&gmail_id=" + gmail_id,
-					ServiceHandler.GET);
+					Constants.BASE_URL2 + "?app_id="
+							+ URLEncoder.encode(app_id) + "&access_token="
+							+ URLEncoder.encode(access_toke) + "&mobile="
+							+ URLEncoder.encode(otp_number) + "&imei="
+							+ URLEncoder.encode(imei) + "&mcc="
+							+ URLEncoder.encode(mcc) + "&mnc="
+							+ URLEncoder.encode(mnc) + "&lat="
+							+ URLEncoder.encode(latitude) + "&brand_name="
+							+ URLEncoder.encode(brand_name) + "&os_version="
+							+ URLEncoder.encode(os) + "&model_number="
+							+ URLEncoder.encode(model_num) + "&lon="
+							+ URLEncoder.encode(longitude) + "&gmail_id="
+							+ URLEncoder.encode(gmail_id), ServiceHandler.GET);
 
 			try {
 				JSONObject obj = new JSONObject(json);
@@ -780,4 +766,12 @@ public class VerifyMobile extends Activity {
 		super.onRestart();
 	}
 
+	public String ClearString(String st) {
+		st = st.replace(" ", "");
+		st = st.replace("+", "");
+		st = st.replace("-", "");
+		st = st.replace("(", "");
+		st = st.replace(")", "");
+		return st;
+	}
 }

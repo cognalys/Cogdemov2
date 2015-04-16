@@ -3,7 +3,7 @@ mobile number verification library (v2) integrated for android
 
 The working demo is published on google play store :
 
-[https://play.google.com/store/apps/details?id=com.matesnetwork.cogdemo](https://play.google.com/store/apps/details?id=com.matesnetwork.cogdemo)
+[https://play.google.com/store/apps/details?id=com.matesnetwork.cogdemov2](https://play.google.com/store/apps/details?id=com.matesnetwork.cogdemov2)
 
 
 For documentaion :
