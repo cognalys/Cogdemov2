@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /home/node4/workspace/Cognalys/src/com/android/internal/telephony/ITelephony.aidl
+ * Original file: E:\\work\\Cognalys\\src\\com\\android\\internal\\telephony\\ITelephony.aidl
  */
 package com.android.internal.telephony;
 public interface ITelephony extends android.os.IInterface

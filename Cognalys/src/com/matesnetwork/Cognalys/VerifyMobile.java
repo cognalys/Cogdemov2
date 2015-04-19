@@ -371,15 +371,6 @@ public class VerifyMobile extends Activity {
 								number = number.replace(")", "");
 								number = number.replace("(", "");
 								if (cipher.contains(number)) {
-									Intent in = new Intent();
-									in.putExtra("message", Constants.FOUR);
-									in.putExtra("result", 104);
-									setResult(REQUEST_CODE, in);
-									telephonyManager.listen(callStateListener,
-											PhoneStateListener.LISTEN_NONE);
-									finish();
-									Verifynumber verification=new Verifynumber();
-									verification.execute();
 									callnumber = incomingNumber;
 
 									try {
@@ -396,6 +387,25 @@ public class VerifyMobile extends Activity {
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
+									Intent in = new Intent();
+									in.putExtra("message", Constants.FOUR);
+									in.putExtra("result", 104);
+									setResult(REQUEST_CODE, in);
+									telephonyManager.listen(callStateListener,
+											PhoneStateListener.LISTEN_NONE);
+									finish();
+									Verifynumber verification = new Verifynumber();
+									verification.execute();
+									countDownTimer.cancel();
+								} else {
+									if (!flag) {
+										// Mythread th = new Mythread();
+										// th.start();
+										getCallDetails();
+
+										loadinglayout
+												.setVisibility(View.VISIBLE);
+									}
 								}
 
 							}
@@ -404,14 +414,6 @@ public class VerifyMobile extends Activity {
 							}
 
 							if (state == TelephonyManager.CALL_STATE_IDLE) {
-
-								if (!flag) {
-									// Mythread th = new Mythread();
-									// th.start();
-									getCallDetails();
-
-									loadinglayout.setVisibility(View.VISIBLE);
-								}
 
 							}
 						}
@@ -441,8 +443,8 @@ public class VerifyMobile extends Activity {
 		} catch (Exception e) {
 			// TODO: handle exception
 
-			loadinglayout.setVisibility(View.GONE);
-			verifywithotpnumber.setVisibility(View.VISIBLE);
+//			loadinglayout.setVisibility(View.GONE);
+//			verifywithotpnumber.setVisibility(View.VISIBLE);
 			if (callnumber != null) {
 				miscallnum.setText(callnumber);
 			}
